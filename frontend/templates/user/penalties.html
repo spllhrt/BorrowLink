@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Penalties</title>
+    <style>
+        /* User penalties page prefix: up */
+        .up-container {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .up-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .up-table th,
+        .up-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .up-table th {
+            background-color: #f0f0f0;
+        }
+
+        .up-paid {
+            color: green;
+            font-weight: bold;
+        }
+
+        .up-unpaid {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="up-container">
+        <h2>My Penalties</h2>
+        <table class="up-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Paid At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for penalty in penalties %}
+                <tr>
+                    <td>{{ penalty.borrow_transaction.item.name }}</td>
+                    <td>{{ penalty.amount }}</td>
+                    <td class="up-{{ penalty.status|lower }}">{{ penalty.status }}</td>
+                    <td>{{ penalty.borrow_transaction.due_date }}</td>
+                    <td>{{ penalty.paid_at|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No penalties found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/user/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/user/navigation.css' %}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'browse_items' %}">Browse Items</a></li>
+            <li><a href="{% url 'my_borrows' %}">My Borrowed</a></li>
+            <li><a href="{% url 'user_penalties' %}">Penalties</a></li>
+            <li class="logout"><a href="{% url 'signout' %}">Logout</a></li>
+        </ul>
+    </nav>
+    <div class="dashboard-container">
+        <h1>Welcome, {{ request.user.username }}!</h1>
+        <p><strong>Department:</strong> {{ request.user.profile.department }}</p>
+        <p><strong>ID Number:</strong> {{ request.user.profile.id_number }}</p>
+        <p>Here you can borrow items, check availability, and track your history.</p>
+
+        <div class="cards-container">
+            <div class="card">Browse Items</div>
+            <div class="card">My Borrowed Items</div>
+            <div class="card">Return Request</div>
+            <div class="card">My Penalties</div>
+            <div class="card">Transaction History</div>
+        </div>
+    </div>
+
+</body>
+
+</html>

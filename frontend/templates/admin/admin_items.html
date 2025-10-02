@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Admin - Item Management</title>
+    <style>
+        /* Page-specific styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .items-page table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .items-page th,
+        .items-page td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .items-page th {
+            background-color: #f2f2f2;
+        }
+
+        .items-page input,
+        .items-page select {
+            padding: 4px;
+            margin: 2px 0;
+        }
+
+        .items-page button {
+            padding: 5px 10px;
+            margin: 2px 0;
+        }
+
+        .items-page form.inline {
+            display: inline;
+        }
+
+        .items-page h1,
+        .items-page h2 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="items-page">
+        <h1>Item Management</h1>
+
+        <!-- Add New Item Form -->
+        <h2>Add New Item</h2>
+        <form method="POST" action="{% url 'admin_items' %}">
+            {% csrf_token %}
+            <input type="hidden" name="add_item" value="1">
+            <label>Name:</label> <input type="text" name="name" required><br>
+            <label>Type:</label> <input type="text" name="item_type" required><br>
+            <label>Serial Number:</label> <input type="text" name="serial_number" required><br>
+            <label>Condition:</label>
+            <select name="condition" required>
+                <option value="Available">Available</option>
+                <option value="Borrowed">Borrowed</option>
+                <option value="Under Maintenance">Under Maintenance</option>
+                <option value="Lost">Lost</option>
+            </select><br>
+            <label>Stock:</label> <input type="number" name="stock" min="0" required><br>
+            <button type="submit">Add Item</button>
+        </form>
+
+        <hr>
+
+        <!-- List Items -->
+        <h2>Existing Items</h2>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Serial Number</th>
+                <th>Condition</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.item_type }}</td>
+                <td>{{ item.serial_number }}</td>
+                <td>{{ item.condition }}</td>
+                <td>{{ item.stock }}</td>
+                <td>
+                    <!-- Inline Edit Form -->
+                    <form method="POST" action="{% url 'admin_items' %}" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="edit_item" value="1">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <input type="text" name="name" value="{{ item.name }}" required>
+                        <input type="text" name="item_type" value="{{ item.item_type }}" required>
+                        <input type="text" name="serial_number" value="{{ item.serial_number }}" required>
+                        <select name="condition" required>
+                            <option value="Available" {% if item.condition=="Available" %}selected{% endif %}>Available
+                            </option>
+                            <option value="Borrowed" {% if item.condition=="Borrowed" %}selected{% endif %}>Borrowed
+                            </option>
+                            <option value="Under Maintenance" {% if item.condition=="Under Maintenance" %}selected{%
+                                endif %}>Under Maintenance</option>
+                            <option value="Lost" {% if item.condition=="Lost" %}selected{% endif %}>Lost</option>
+                        </select>
+                        <input type="number" name="stock" value="{{ item.stock }}" min="0" required>
+                        <button type="submit">Update</button>
+                    </form>
+
+                    <!-- Inline Delete Form -->
+                    <form method="POST" action="{% url 'admin_items' %}" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_item" value="1">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <button type="submit" onclick="return confirm('Are you sure?');">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+
+</html>

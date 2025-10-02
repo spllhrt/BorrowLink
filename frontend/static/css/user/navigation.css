@@ -1,0 +1,24 @@
+.navbar {
+    background: #4cafef;
+    padding: 12px;
+}
+.navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+.navbar li {
+    margin-right: 18px;
+}
+.navbar a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+.navbar a:hover {
+    color: #222;
+}
+.navbar .logout {
+    margin-left: auto;
+}

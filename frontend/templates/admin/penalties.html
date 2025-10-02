@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Penalties</title>
+    <style>
+        /* Admin penalties page prefix: ap */
+        .ap-container {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .ap-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .ap-table th,
+        .ap-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .ap-table th {
+            background-color: #f0f0f0;
+        }
+
+        .ap-paid {
+            color: green;
+            font-weight: bold;
+        }
+
+        .ap-unpaid {
+            color: red;
+            font-weight: bold;
+        }
+
+        .ap-actions button {
+            padding: 5px 10px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ap-container">
+        <h2>All Penalties</h2>
+        <table class="ap-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Item</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Due Date</th>
+                    <th>Paid At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for penalty in penalties %}
+                <tr>
+                    <td>{{ penalty.borrow_transaction.user.username }}</td>
+                    <td>{{ penalty.borrow_transaction.item.name }}</td>
+                    <td>{{ penalty.amount }}</td>
+                    <td class="ap-{{ penalty.status|lower }}">{{ penalty.status }}</td>
+                    <td>{{ penalty.borrow_transaction.due_date }}</td>
+                    <td>{{ penalty.paid_at|default:"-" }}</td>
+                    <td class="ap-actions">
+                        {% if penalty.status == "Unpaid" %}
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="penalty_id" value="{{ penalty.id }}">
+                            <button type="submit" name="mark_paid">Mark Paid</button>
+                        </form>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">No penalties found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Browse Items</title>
+    <style>
+        .ui-browse-container {
+            max-width: 900px;
+            margin: 30px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .ui-browse-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .ui-browse-table th,
+        .ui-browse-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .ui-browse-table th {
+            background-color: #f2f2f2;
+        }
+
+        .ui-browse-btn {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ui-browse-container">
+        <h2>Available Items</h2>
+        <table class="ui-browse-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Serial</th>
+                    <th>Condition</th>
+                    <th>Stock</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.item_type }}</td>
+                    <td>{{ item.serial_number }}</td>
+                    <td>{{ item.condition }}</td>
+                    <td>{{ item.stock }}</td>
+                    <td><a class="ui-browse-btn" href="{% url 'borrow_request' item.id %}">Borrow</a></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align:center;">No items available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

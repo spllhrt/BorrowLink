@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Borrows</title>
+    <style>
+        .ui-my-container {
+            max-width: 800px;
+            margin: 30px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .ui-my-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .ui-my-table th,
+        .ui-my-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .ui-my-table th {
+            background-color: #f2f2f2;
+        }
+
+        .ui-badge {
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .ui-pending {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .ui-borrowed {
+            background-color: #007bff;
+        }
+
+        .ui-returned {
+            background-color: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ui-my-container">
+        <h2>My Borrowed Items</h2>
+        <table class="ui-my-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for borrow in borrows %}
+                    <tr>
+                        <td>{{ borrow.item.name }}</td>
+                        <td>{{ borrow.quantity }}</td>
+                        <td>
+                            {% if borrow.status == "Pending" %}
+                                <span class="ui-badge ui-pending">Pending</span>
+                            {% elif borrow.status == "Borrowed" %}
+                                <span class="ui-badge ui-borrowed">Borrowed</span>
+                            {% elif borrow.status == "Returned" %}
+                                <span class="ui-badge ui-returned">Returned</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ borrow.created_at|date:"M d, Y H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align:center;">You have no borrow requests</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+
+</html>

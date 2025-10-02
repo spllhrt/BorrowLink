@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/admin/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/admin/navigation.css' %}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <ul>
+            <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'admin_users' %}">Users</a></li>
+            <li><a href="{% url 'admin_items' %}">Items</a></li>
+            <li><a href="{% url 'manage_borrows' %}">Borrowing</a></li>
+            <li><a href="{% url 'admin_penalties' %}">Penalties</a></li>
+            <li><!-- Reports view not implemented -->Reports</li>
+            <li class="logout"><a href="{% url 'signout' %}">Logout</a></li>
+        </ul>
+    </nav>
+
+
+    <div class="dashboard-container">
+        <h1>Admin Dashboard</h1>
+        <p>Manage users, items, and transactions here.</p>
+
+        <div class="cards-container">
+            <div class="card">User Management</div>
+            <div class="card">Item Management</div>
+            <div class="card">Borrowing</div>
+            <div class="card">Returning</div>
+            <div class="card">Penalties</div>
+            <div class="card">Transaction Logs</div>
+            <div class="card">Reports</div>
+        </div>
+    </div>
+
+</body>
+
+</html>

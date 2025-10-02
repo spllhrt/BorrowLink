@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Borrow Request</title>
+    <style>
+        .ui-borrow-container {
+            max-width: 500px;
+            margin: 30px auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .ui-borrow-form input,
+        .ui-borrow-form select {
+            width: 100%;
+            padding: 6px;
+            margin: 6px 0;
+            box-sizing: border-box;
+        }
+
+        .ui-borrow-submit {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .ui-borrow-cancel {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 3px;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ui-borrow-container">
+        <h2>Borrow Request for {{ item.name }}</h2>
+        <form method="post" class="ui-borrow-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="ui-borrow-submit">Submit Request</button>
+            <a href="{% url 'browse_items' %}" class="ui-borrow-cancel">Cancel</a>
+        </form>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Admin - User Management</title>
+    <link rel="stylesheet" href="{% static 'css/admin/navigation.css' %}">
+    <style>
+        /* Page-specific styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .users-page table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .users-page th,
+        .users-page td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .users-page th {
+            background-color: #f2f2f2;
+        }
+
+        .users-page input,
+        .users-page select {
+            padding: 4px;
+            margin: 2px 0;
+        }
+
+        .users-page button {
+            padding: 5px 10px;
+            margin: 2px 0;
+        }
+
+        .users-page form.inline {
+            display: inline;
+        }
+
+        .users-page h1,
+        .users-page h2 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="users-page">
+        <h1>User Management</h1>
+
+        <!-- Add New User Form -->
+        <h2>Add New User</h2>
+        <form method="POST" action="{% url 'admin_users' %}">
+            {% csrf_token %}
+            <input type="hidden" name="add_user" value="1">
+            <label>Username:</label> <input type="text" name="username" required><br>
+            <label>Email:</label> <input type="email" name="email" required><br>
+            <label>Department:</label> <input type="text" name="department" required><br>
+            <label>ID Number:</label> <input type="text" name="id_number" required><br>
+            <label>Password:</label> <input type="password" name="password" required><br>
+            <button type="submit">Add User</button>
+        </form>
+
+        <hr>
+
+        <!-- List Users -->
+        <h2>Existing Users</h2>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>ID Number</th>
+                <th>Actions</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.profile.department }}</td>
+                <td>{{ user.profile.id_number }}</td>
+                <td>
+                    <!-- Inline Edit Form -->
+                    <form method="POST" action="{% url 'admin_users' %}" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="edit_user" value="1">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <input type="text" name="username" value="{{ user.username }}" required>
+                        <input type="email" name="email" value="{{ user.email }}" required>
+                        <input type="text" name="department" value="{{ user.profile.department }}" required>
+                        <input type="text" name="id_number" value="{{ user.profile.id_number }}" required>
+                        <button type="submit">Update</button>
+                    </form>
+
+                    <!-- Inline Delete Form -->
+                    <form method="POST" action="{% url 'admin_users' %}" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete_user" value="1">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <button type="submit" onclick="return confirm('Are you sure?');">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+
+</html>
