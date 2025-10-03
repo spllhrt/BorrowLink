@@ -7,6 +7,48 @@
     <title>User Dashboard</title>
     <link rel="stylesheet" href="{% static 'css/user/dashboard.css' %}">
     <link rel="stylesheet" href="{% static 'css/user/navigation.css' %}">
+    <style>
+        /* Profile styling inside navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar ul {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 15px;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+        }
+
+        .navbar .profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .navbar .profile img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .navbar .profile span {
+            font-weight: bold;
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body>
@@ -19,20 +61,23 @@
             <li><a href="{% url 'user_penalties' %}">Penalties</a></li>
             <li class="logout"><a href="{% url 'signout' %}">Logout</a></li>
         </ul>
+
+        <!-- Profile section (redirects to profile page) -->
+        <a href="{% url 'user_profile' %}" class="profile">
+            {% if request.user.profile.profile_image %}
+                <img src="{{ request.user.profile.profile_image.url }}" alt="Profile">
+            {% else %}
+                <img src="{% static 'images/default-profile.png' %}" alt="Profile">
+            {% endif %}
+            <span>{{ request.user.username }}</span>
+        </a>
     </nav>
+
     <div class="dashboard-container">
         <h1>Welcome, {{ request.user.username }}!</h1>
         <p><strong>Department:</strong> {{ request.user.profile.department }}</p>
         <p><strong>ID Number:</strong> {{ request.user.profile.id_number }}</p>
         <p>Here you can borrow items, check availability, and track your history.</p>
-
-        <div class="cards-container">
-            <div class="card">Browse Items</div>
-            <div class="card">My Borrowed Items</div>
-            <div class="card">Return Request</div>
-            <div class="card">My Penalties</div>
-            <div class="card">Transaction History</div>
-        </div>
     </div>
 
 </body>

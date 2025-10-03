@@ -104,15 +104,12 @@
                         <input type="hidden" name="item_id" value="{{ item.id }}">
                         <input type="text" name="name" value="{{ item.name }}" required>
                         <input type="text" name="item_type" value="{{ item.item_type }}" required>
-                        <input type="text" name="serial_number" value="{{ item.serial_number }}" required>
+                        <input type="text" name="serial_number" value="{{ item.serial_number }}" readonly>
                         <select name="condition" required>
-                            <option value="Available" {% if item.condition=="Available" %}selected{% endif %}>Available
-                            </option>
-                            <option value="Borrowed" {% if item.condition=="Borrowed" %}selected{% endif %}>Borrowed
-                            </option>
-                            <option value="Under Maintenance" {% if item.condition=="Under Maintenance" %}selected{%
-                                endif %}>Under Maintenance</option>
-                            <option value="Lost" {% if item.condition=="Lost" %}selected{% endif %}>Lost</option>
+                            <option value="Available" {% if item.condition == 'Available' %}selected{% endif %}>Available</option>
+                            <option value="Borrowed" {% if item.condition == 'Borrowed' %}selected{% endif %}>Borrowed</option>
+                            <option value="Under Maintenance" {% if item.condition == 'Under Maintenance' %}selected{% endif %}>Under Maintenance</option>
+                            <option value="Lost" {% if item.condition == 'Lost' %}selected{% endif %}>Lost</option>
                         </select>
                         <input type="number" name="stock" value="{{ item.stock }}" min="0" required>
                         <button type="submit">Update</button>

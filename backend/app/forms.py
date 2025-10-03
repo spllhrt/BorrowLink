@@ -41,7 +41,15 @@ class ItemForm(forms.ModelForm):
 class BorrowForm(forms.ModelForm):
     class Meta:
         model = BorrowTransaction
-        fields = ['item', 'quantity', 'due_date']
-        widgets = {
-            'due_date': forms.DateInput(attrs={'type': 'date'}),
-        }
+        fields = ['item', 'quantity']
+
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['department', 'id_number', 'contact_number', 'profile_image']

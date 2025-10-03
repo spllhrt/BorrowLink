@@ -3,9 +3,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
+from datetime import timedelta
 from django.utils import timezone
+from django.db.models import Sum
 
-from .forms import SignUpForm, BorrowForm
+from .forms import SignUpForm, BorrowForm, UserUpdateForm, ProfileUpdateForm
 from .models import Profile, Item, BorrowTransaction, Penalty
 from django.contrib.auth.models import User
 
@@ -187,6 +189,9 @@ def borrow_request(request, item_id):
 
 @login_required
 def my_borrows(request):
+    # Auto-check overdue before showing list
+    check_and_create_penalties(request.user)
+
     borrows = BorrowTransaction.objects.filter(user=request.user)
     return render(request, "user/my_borrows.html", {"borrows": borrows})
 
@@ -194,6 +199,9 @@ def my_borrows(request):
 # --------- Borrowing System (Admin side) ---------
 @user_passes_test(admin_check)
 def manage_borrows(request):
+    # Auto-check overdue before showing list
+    check_and_create_penalties()
+
     borrows = BorrowTransaction.objects.all()
     return render(request, "admin/manage_borrows.html", {"borrows": borrows})
 
@@ -204,8 +212,10 @@ def approve_borrow(request, borrow_id):
         borrow.item.stock -= borrow.quantity
         borrow.item.save()
         borrow.status = "Borrowed"
+        borrow.borrow_date = timezone.now().date()
+        borrow.due_date = timezone.now().date() + timedelta(days=3)
         borrow.save()
-        messages.success(request, "Borrow request approved.")
+        messages.success(request, "Borrow request approved. Due in 3 days.")
     else:
         messages.error(request, "Not enough stock.")
     return redirect("manage_borrows")
@@ -216,6 +226,7 @@ def return_item(request, borrow_id):
     borrow.item.stock += borrow.quantity
     borrow.item.save()
     borrow.status = "Returned"
+    borrow.return_date = timezone.now().date()
     borrow.save()
     messages.success(request, "Item marked as returned.")
     return redirect("manage_borrows")
@@ -252,8 +263,88 @@ def check_and_create_penalties(user=None):
         if borrow.is_overdue():
             borrow.status = 'Overdue'
             borrow.save()
-            # Create penalty if it doesn't exist
             if not hasattr(borrow, 'penalty'):
                 days_overdue = (timezone.now().date() - borrow.due_date).days
                 amount = days_overdue * 50  # Example: 50 per day overdue
                 Penalty.objects.create(borrow_transaction=borrow, amount=amount)
+
+@user_passes_test(admin_check)
+def update_borrow_status(request, borrow_id):
+    borrow = get_object_or_404(BorrowTransaction, id=borrow_id)
+
+    if request.method == "POST":
+        new_status = request.POST.get("status")
+        if new_status in dict(BorrowTransaction.STATUS_CHOICES):
+            if borrow.status == "Pending" and new_status == "Borrowed":
+                if borrow.item.stock >= borrow.quantity:
+                    borrow.item.stock -= borrow.quantity
+                    borrow.borrow_date = timezone.now().date()
+                    borrow.due_date = timezone.now().date() + timedelta(days=3)
+                    borrow.item.save()
+                else:
+                    messages.error(request, "Not enough stock.")
+                    return redirect("manage_borrows")
+
+            elif borrow.status == "Borrowed" and new_status == "Returned":
+                borrow.item.stock += borrow.quantity
+                borrow.return_date = timezone.now().date()
+                borrow.item.save()
+
+            borrow.status = new_status
+            borrow.save()
+            messages.success(request, f"Borrow status updated to {new_status}.")
+
+    return redirect("manage_borrows")
+
+
+# --------- Reports ---------
+@user_passes_test(admin_check)
+def admin_reports(request):
+    total_users = User.objects.filter(is_staff=False).count()
+    total_items = Item.objects.count()
+    total_borrows = BorrowTransaction.objects.count()
+    active_borrows = BorrowTransaction.objects.filter(status__in=["Borrowed", "Overdue"]).count()
+    returned_borrows = BorrowTransaction.objects.filter(status="Returned").count()
+    pending_requests = BorrowTransaction.objects.filter(status="Pending").count()
+
+    total_penalties = Penalty.objects.count()
+    paid_penalties = Penalty.objects.filter(status="Paid").count()
+    unpaid_penalties = Penalty.objects.filter(status="Unpaid").count()
+    total_collected = Penalty.objects.filter(status="Paid").aggregate(total=Sum("amount"))["total"] or 0
+
+    context = {
+        "total_users": total_users,
+        "total_items": total_items,
+        "total_borrows": total_borrows,
+        "active_borrows": active_borrows,
+        "returned_borrows": returned_borrows,
+        "pending_requests": pending_requests,
+        "total_penalties": total_penalties,
+        "paid_penalties": paid_penalties,
+        "unpaid_penalties": unpaid_penalties,
+        "total_collected": total_collected,
+    }
+    return render(request, "admin/reports.html", context)
+
+@login_required
+def user_profile(request):
+    if request.method == "POST":
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        profile_form = ProfileUpdateForm(
+            request.POST, 
+            request.FILES,
+            instance=request.user.profile
+        )
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "Profile updated successfully.")
+            return redirect("user_profile")
+    else:
+        user_form = UserUpdateForm(instance=request.user)
+        profile_form = ProfileUpdateForm(instance=request.user.profile)
+
+    return render(request, "user/profile.html", {
+        "user_form": user_form,
+        "profile_form": profile_form
+    })

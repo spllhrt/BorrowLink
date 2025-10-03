@@ -6,7 +6,7 @@
     <title>Manage Borrows</title>
     <style>
         .ui-admin-container {
-            max-width: 900px;
+            max-width: 1100px;
             margin: 30px auto;
             font-family: Arial, sans-serif;
         }
@@ -15,33 +15,18 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            font-size: 14px;
         }
 
         .ui-admin-table th,
         .ui-admin-table td {
             border: 1px solid #ccc;
             padding: 8px;
-            text-align: left;
+            text-align: center;
         }
 
         .ui-admin-table th {
             background-color: #f2f2f2;
-        }
-
-        .ui-btn {
-            padding: 4px 8px;
-            border-radius: 3px;
-            text-decoration: none;
-            color: white;
-            font-size: 12px;
-        }
-
-        .ui-approve {
-            background-color: #28a745;
-        }
-
-        .ui-return {
-            background-color: #17a2b8;
         }
 
         .ui-badge {
@@ -51,17 +36,16 @@
             font-size: 12px;
         }
 
-        .ui-pending {
-            background-color: #ffc107;
-            color: black;
-        }
+        .ui-pending { background-color: #ffc107; color: black; }
+        .ui-approved { background-color: #6c757d; }
+        .ui-rejected { background-color: #dc3545; }
+        .ui-borrowed { background-color: #007bff; }
+        .ui-returned { background-color: #28a745; }
+        .ui-overdue { background-color: #ff5733; }
 
-        .ui-borrowed {
-            background-color: #007bff;
-        }
-
-        .ui-returned {
-            background-color: #28a745;
+        select {
+            padding: 4px;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -76,7 +60,9 @@
                     <th>Item</th>
                     <th>Quantity</th>
                     <th>Status</th>
-                    <th>Date</th>
+                    <th>Borrow Date</th>
+                    <th>Due Date</th>
+                    <th>Return Date</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -87,25 +73,52 @@
                     <td>{{ borrow.item.name }}</td>
                     <td>{{ borrow.quantity }}</td>
                     <td>
-                        {% if borrow.status == "Pending" %}<span class="ui-badge ui-pending">Pending</span>{% endif %}
-                        {% if borrow.status == "Borrowed" %}<span class="ui-badge ui-borrowed">Borrowed</span>{% endif
-                        %}
-                        {% if borrow.status == "Returned" %}<span class="ui-badge ui-returned">Returned</span>{% endif
-                        %}
-                    </td>
-                    <td>{{ borrow.created_at|date:"M d, Y H:i" }}</td>
-                    <td>
                         {% if borrow.status == "Pending" %}
-                        <a class="ui-btn ui-approve" href="{% url 'approve_borrow' borrow.id %}">Approve</a>
+                            <span class="ui-badge ui-pending">Pending</span>
+                        {% elif borrow.status == "Approved" %}
+                            <span class="ui-badge ui-approved">Approved</span>
+                        {% elif borrow.status == "Rejected" %}
+                            <span class="ui-badge ui-rejected">Rejected</span>
+                        {% elif borrow.status == "Borrowed" %}
+                            <span class="ui-badge ui-borrowed">Borrowed</span>
+                        {% elif borrow.status == "Returned" %}
+                            <span class="ui-badge ui-returned">Returned</span>
+                        {% elif borrow.status == "Overdue" %}
+                            <span class="ui-badge ui-overdue">Overdue</span>
                         {% endif %}
-                        {% if borrow.status == "Borrowed" %}
-                        <a class="ui-btn ui-return" href="{% url 'return_item' borrow.id %}">Mark Returned</a>
+                    </td>
+                    <td>{{ borrow.borrow_date|date:"M d, Y" }}</td>
+                    <td>
+                        {% if borrow.due_date %}
+                            {{ borrow.due_date|date:"M d, Y" }}
+                        {% else %}
+                            -
                         {% endif %}
+                    </td>
+                    <td>
+                        {% if borrow.return_date %}
+                            {{ borrow.return_date|date:"M d, Y" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="{% url 'update_borrow_status' borrow.id %}">
+                            {% csrf_token %}
+                            <select name="status" onchange="this.form.submit()">
+                                <option value="">-- Select Action --</option>
+                                {% for code, label in borrow.STATUS_CHOICES %}
+                                    <option value="{{ code }}" {% if borrow.status == code %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </form>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align:center;">No borrow transactions yet</td>
+                    <td colspan="8" style="text-align:center;">No borrow transactions yet</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -30,8 +30,11 @@ urlpatterns = [
     
     # User penalties
     path('user/penalties/', views.user_penalties, name='user_penalties'),
+    path("user/profile/", views.user_profile, name="user_profile"),
 
     # Admin penalties
     path('admin/penalties/', views.admin_penalties, name='admin_penalties'),
+    path("admin/reports/", views.admin_reports, name="admin_reports"),  
+    path("borrows/<int:borrow_id>/update/", views.update_borrow_status, name="update_borrow_status"),
 
 ]

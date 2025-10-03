@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+    <style>
+        .ui-profile-container {
+            max-width: 600px;
+            margin: 30px auto;
+            font-family: Arial, sans-serif;
+        }
+        .ui-profile-container h2 {
+            text-align: center;
+        }
+        .ui-profile-img {
+            display: block;
+            margin: 0 auto 20px auto;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
+        .ui-profile-form label {
+            display: block;
+            margin-top: 10px;
+        }
+        .ui-profile-form input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        .ui-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .ui-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-profile-container">
+        <h2>My Profile</h2>
+
+        {% if user.profile.profile_image %}
+            <img src="{{ user.profile.profile_image.url }}" class="ui-profile-img" alt="Profile Image">
+        {% else %}
+            <img src="/static/default-profile.png" class="ui-profile-img" alt="Default Profile">
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="ui-profile-form">
+            {% csrf_token %}
+            {{ user_form.as_p }}
+            {{ profile_form.as_p }}
+            <button type="submit" class="ui-btn">Update Profile</button>
+        </form>
+    </div>
+</body>
+</html>

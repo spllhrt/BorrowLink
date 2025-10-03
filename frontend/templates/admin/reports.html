@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Reports</title>
+    <style>
+        .reports-container {
+            max-width: 800px;
+            margin: 30px auto;
+            font-family: Arial, sans-serif;
+        }
+        .reports-card {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+        }
+        .reports-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .reports-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .reports-highlight {
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="reports-container">
+        <h2>System Reports</h2>
+
+        <div class="reports-grid">
+            <div class="reports-card">
+                <h3>Users</h3>
+                <p>Total Users: <span class="reports-highlight">{{ total_users }}</span></p>
+            </div>
+
+            <div class="reports-card">
+                <h3>Items</h3>
+                <p>Total Items: <span class="reports-highlight">{{ total_items }}</span></p>
+            </div>
+
+            <div class="reports-card">
+                <h3>Borrows</h3>
+                <p>Total Requests: <span class="reports-highlight">{{ total_borrows }}</span></p>
+                <p>Active (Borrowed + Overdue): <span class="reports-highlight">{{ active_borrows }}</span></p>
+                <p>Returned: <span class="reports-highlight">{{ returned_borrows }}</span></p>
+                <p>Pending: <span class="reports-highlight">{{ pending_requests }}</span></p>
+            </div>
+
+            <div class="reports-card">
+                <h3>Penalties</h3>
+                <p>Total Penalties: <span class="reports-highlight">{{ total_penalties }}</span></p>
+                <p>Paid: <span class="reports-highlight">{{ paid_penalties }}</span></p>
+                <p>Unpaid: <span class="reports-highlight">{{ unpaid_penalties }}</span></p>
+                <p>Total Collected: <span class="reports-highlight">₱{{ total_collected }}</span></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

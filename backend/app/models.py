@@ -8,6 +8,7 @@ class Profile(models.Model):
     department = models.CharField(max_length=100, blank=True)
     id_number = models.CharField(max_length=50, blank=True)
     contact_number = models.CharField(max_length=20, blank=True)
+    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
 
     def __str__(self):
         return self.user.username
@@ -45,8 +46,8 @@ class BorrowTransaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    borrow_date = models.DateField(auto_now_add=True)
-    due_date = models.DateField()
+    borrow_date = models.DateField(null=True, blank=True)
+    due_date = models.DateField(null=True, blank=True)
     return_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
 

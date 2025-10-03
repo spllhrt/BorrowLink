@@ -6,7 +6,7 @@
     <title>My Borrows</title>
     <style>
         .ui-my-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 30px auto;
             font-family: Arial, sans-serif;
         }
@@ -40,12 +40,24 @@
             color: black;
         }
 
+        .ui-approved {
+            background-color: #6c757d;
+        }
+
+        .ui-rejected {
+            background-color: #dc3545;
+        }
+
         .ui-borrowed {
             background-color: #007bff;
         }
 
         .ui-returned {
             background-color: #28a745;
+        }
+
+        .ui-overdue {
+            background-color: #ff0000;
         }
     </style>
 </head>
@@ -59,7 +71,9 @@
                     <th>Item</th>
                     <th>Quantity</th>
                     <th>Status</th>
-                    <th>Date</th>
+                    <th>Borrow Date</th>
+                    <th>Due Date</th>
+                    <th>Return Date</th>
                 </tr>
             </thead>
             <tbody>
@@ -70,17 +84,37 @@
                         <td>
                             {% if borrow.status == "Pending" %}
                                 <span class="ui-badge ui-pending">Pending</span>
+                            {% elif borrow.status == "Approved" %}
+                                <span class="ui-badge ui-approved">Approved</span>
+                            {% elif borrow.status == "Rejected" %}
+                                <span class="ui-badge ui-rejected">Rejected</span>
                             {% elif borrow.status == "Borrowed" %}
                                 <span class="ui-badge ui-borrowed">Borrowed</span>
                             {% elif borrow.status == "Returned" %}
                                 <span class="ui-badge ui-returned">Returned</span>
+                            {% elif borrow.status == "Overdue" %}
+                                <span class="ui-badge ui-overdue">Overdue</span>
                             {% endif %}
                         </td>
-                        <td>{{ borrow.created_at|date:"M d, Y H:i" }}</td>
+                        <td>{{ borrow.borrow_date|date:"M d, Y" }}</td>
+                        <td>
+                            {% if borrow.due_date %}
+                                {{ borrow.due_date|date:"M d, Y" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if borrow.return_date %}
+                                {{ borrow.return_date|date:"M d, Y" }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="4" style="text-align:center;">You have no borrow requests</td>
+                        <td colspan="6" style="text-align:center;">You have no borrow requests</td>
                     </tr>
                 {% endfor %}
             </tbody>
