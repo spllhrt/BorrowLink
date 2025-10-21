@@ -1,83 +1,411 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>My Borrows</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Borrows - BorrowLink</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f4c81 0%, #1e3a5f 50%, #0a2342 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background elements */
+        .bg-decoration {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, #4a90e2, transparent);
+            top: -100px;
+            right: -100px;
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #5ba3f5, transparent);
+            bottom: -80px;
+            left: -80px;
+            animation-delay: 5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Navbar */
+        .navbar {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+        }
+
+        .navbar-brand svg {
+            width: 32px;
+            height: 32px;
+            fill: #5ba3f5;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .back-link svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        /* Container */
         .ui-my-container {
-            max-width: 900px;
-            margin: 30px auto;
-            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 35px 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h2 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header h2 svg {
+            width: 36px;
+            height: 36px;
+            fill: #5ba3f5;
+        }
+
+        .page-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 15px;
+            margin-top: 10px;
+        }
+
+        /* Table Container */
+        .table-container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-x: auto;
+            animation: slideIn 0.6s ease-out 0.1s;
+            animation-fill-mode: both;
         }
 
         .ui-my-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            min-width: 800px;
         }
 
-        .ui-my-table th,
-        .ui-my-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
+        .ui-my-table thead {
+            background: rgba(91, 163, 245, 0.15);
+            border-radius: 10px;
         }
 
         .ui-my-table th {
-            background-color: #f2f2f2;
+            padding: 16px 20px;
+            text-align: left;
+            color: #87c5ff;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
         }
 
-        .ui-badge {
-            padding: 2px 6px;
-            border-radius: 3px;
+        .ui-my-table th:first-child {
+            border-radius: 10px 0 0 10px;
+        }
+
+        .ui-my-table th:last-child {
+            border-radius: 0 10px 10px 0;
+        }
+
+        .ui-my-table tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .ui-my-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .ui-my-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .ui-my-table td {
+            padding: 18px 20px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            border: none;
+        }
+
+        .ui-my-table td:first-child {
+            font-weight: 600;
             color: white;
+        }
+
+        /* Status Badges */
+        .ui-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
             font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .ui-pending {
-            background-color: #ffc107;
-            color: black;
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
         .ui-approved {
-            background-color: #6c757d;
+            background: rgba(108, 117, 125, 0.2);
+            color: #adb5bd;
+            border: 1px solid rgba(108, 117, 125, 0.3);
         }
 
         .ui-rejected {
-            background-color: #dc3545;
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
         .ui-borrowed {
-            background-color: #007bff;
+            background: rgba(0, 123, 255, 0.2);
+            color: #4dabf7;
+            border: 1px solid rgba(0, 123, 255, 0.3);
         }
 
         .ui-returned {
-            background-color: #28a745;
+            background: rgba(40, 167, 69, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(40, 167, 69, 0.3);
         }
 
         .ui-overdue {
-            background-color: #ff0000;
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff5252;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            animation: pulse-overdue 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-overdue {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            fill: rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state a {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #3d8be8, #2563c9);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .empty-state a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 201, 0.6);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .ui-my-container {
+                padding: 0 20px;
+                margin: 30px auto;
+            }
+
+            .page-header {
+                padding: 25px;
+            }
+
+            .page-header h2 {
+                font-size: 24px;
+            }
+
+            .table-container {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 580px) {
+            .navbar-brand span {
+                display: none;
+            }
+
+            .page-header h2 {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="bg-decoration circle-1"></div>
+    <div class="bg-decoration circle-2"></div>
+
+    <nav class="navbar">
+        <a href="{% url 'user_dashboard' %}" class="navbar-brand">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 7.5C3 5.567 4.567 4 6.5 4h11c1.933 0 3.5 1.567 3.5 3.5v9c0 1.933-1.567 3.5-3.5 3.5h-11C4.567 20 3 18.433 3 16.5v-9zm6 2.5c0-.552.448-1 1-1h4c.552 0 1 .448 1 1s-.448 1-1 1h-4c-.552 0-1-.448-1-1zm0 4c0-.552.448-1 1-1h4c.552 0 1 .448 1 1s-.448 1-1 1h-4c-.552 0-1-.448-1-1z"/>
+            </svg>
+            <span>BORROWLINK</span>
+        </a>
+
+        <a href="{% url 'user_dashboard' %}" class="back-link">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+            Back to Dashboard
+        </a>
+    </nav>
+
     <div class="ui-my-container">
-        <h2>My Borrowed Items</h2>
-        <table class="ui-my-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Quantity</th>
-                    <th>Status</th>
-                    <th>Borrow Date</th>
-                    <th>Due Date</th>
-                    <th>Return Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for borrow in borrows %}
+        <div class="page-header">
+            <h2>
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                </svg>
+                My Borrowed Items
+            </h2>
+            <p>Track all your current and past borrow transactions</p>
+        </div>
+
+        <div class="table-container">
+            {% if borrows %}
+            <table class="ui-my-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Borrow Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for borrow in borrows %}
                     <tr>
                         <td>{{ borrow.item.name }}</td>
                         <td>{{ borrow.quantity }}</td>
@@ -101,24 +429,31 @@
                             {% if borrow.due_date %}
                                 {{ borrow.due_date|date:"M d, Y" }}
                             {% else %}
-                                -
+                                —
                             {% endif %}
                         </td>
                         <td>
                             {% if borrow.return_date %}
                                 {{ borrow.return_date|date:"M d, Y" }}
                             {% else %}
-                                -
+                                —
                             {% endif %}
                         </td>
                     </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="6" style="text-align:center;">You have no borrow requests</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                </svg>
+                <h3>No Borrow Requests</h3>
+                <p>You haven't borrowed any items yet. Start browsing our inventory!</p>
+                <a href="{% url 'browse_items' %}">Browse Items</a>
+            </div>
+            {% endif %}
+        </div>
     </div>
 </body>
 

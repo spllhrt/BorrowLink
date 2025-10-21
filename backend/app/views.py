@@ -50,7 +50,7 @@ def signin_view(request):
 def signout_view(request):
     logout(request)
     messages.success(request, "You have been logged out.")
-    return redirect('signin')
+    return redirect('home')
 
 # --------- Dashboards ---------
 @login_required
@@ -348,3 +348,12 @@ def user_profile(request):
         "user_form": user_form,
         "profile_form": profile_form
     })
+
+def home_page(request):
+    return render(request, 'user/home.html')
+
+def contact_page(request):
+    return render(request, 'user/contact.html')
+
+def about_page(request):
+    return render(request, 'user/about.html')
