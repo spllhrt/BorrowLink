@@ -463,8 +463,8 @@ def about_page(request):
 
 
 def admin_dashboard(request):
-    # Total users
-    total_users = User.objects.count()
+    # Total users excluding superadmin
+    total_users = User.objects.filter(is_superuser=False).count()
 
     # Total items
     total_items = Item.objects.count()
@@ -484,6 +484,7 @@ def admin_dashboard(request):
         'unpaid_penalties': unpaid_penalties,
     }
     return render(request, 'admin/dashboard.html', context)
+
     
 @user_passes_test(admin_check)
 def cancel_overdue(request, borrow_id):
