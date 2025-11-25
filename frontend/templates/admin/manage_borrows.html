@@ -319,12 +319,6 @@
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
 
-        .status-approved {
-            background: rgba(108, 117, 125, 0.2);
-            color: #adb5bd;
-            border: 1px solid rgba(108, 117, 125, 0.3);
-        }
-
         .status-rejected {
             background: rgba(220, 53, 69, 0.2);
             color: #ff6b6b;
@@ -530,7 +524,6 @@
                     <select>
                         <option value="">All Statuses</option>
                         <option value="pending">Pending</option>
-                        <option value="approved">Approved</option>
                         <option value="borrowed">Borrowed</option>
                         <option value="returned">Returned</option>
                         <option value="overdue">Overdue</option>
@@ -581,8 +574,6 @@
                             <td>
                                 {% if borrow.status == "Pending" %}
                                     <span class="status-badge status-pending">Pending</span>
-                                {% elif borrow.status == "Approved" %}
-                                    <span class="status-badge status-approved">Approved</span>
                                 {% elif borrow.status == "Rejected" %}
                                     <span class="status-badge status-rejected">Rejected</span>
                                 {% elif borrow.status == "Borrowed" %}

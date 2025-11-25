@@ -508,11 +508,18 @@
                     </div>
                 </div>
 
-                {% if item.stock > 0 %}
+                {% if item.stock > 0 and item.condition != 'Lost' and item.condition != 'Under Maintenance' and item.condition != 'Borrowed' %}
                     <a class="ui-browse-btn" href="{% url 'borrow_request' item.id %}">Borrow Item</a>
                 {% else %}
-                    <a class="ui-browse-btn disabled" onclick="return false;">Out of Stock</a>
+                    <a class="ui-browse-btn disabled" onclick="return false;">
+                        {% if item.stock == 0 %}
+                            Out of Stock
+                        {% else %}
+                            {{ item.condition }}
+                        {% endif %}
+                    </a>
                 {% endif %}
+
             </div>
             {% endfor %}
         </div>
