@@ -1,0 +1,20 @@
+﻿ANTONIO - SEPILLO
+BSIT NS 4A
+BORROWLINK GUIDE
+
+
+* open ITELECT Folder in VS Code
+* go to terminal
+   * .\venv\Scripts\activate
+   * cd backend
+
+
+* Tapos run mo na sha
+   * python manage.py runserver
+   * http://127.0.0.1:8000/
+
+
+* LOGIN CREDENTIALS:
+   * For admin - username: admin | pass: qwerty
+
+   * For users - username: crisha | pass: 12345678
