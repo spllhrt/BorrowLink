@@ -420,13 +420,6 @@
                 <h2>My Profile</h2>
                 <p>Manage your personal information and account settings</p>
             </div>
-
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="success-message">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-
             <div class="profile-image-section">
                 <div class="profile-image-wrapper">
                     {% if user.profile.profile_image %}

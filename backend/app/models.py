@@ -55,7 +55,12 @@ class BorrowTransaction(models.Model):
         return f"{self.user.username} - {self.item.name} ({self.status})"
 
     def is_overdue(self):
-        return self.status in ['Borrowed', 'Approved'] and timezone.now().date() > self.due_date
+        return (
+            self.due_date is not None and
+            self.status in ['Borrowed', 'Approved'] and
+            timezone.now().date() > self.due_date
+        )
+
 
 
 # ---------------- Penalty ----------------

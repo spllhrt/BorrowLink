@@ -223,20 +223,44 @@ def approve_borrow(request, borrow_id):
 @user_passes_test(admin_check)
 def return_item(request, borrow_id):
     borrow = get_object_or_404(BorrowTransaction, id=borrow_id)
-    borrow.item.stock += borrow.quantity
-    borrow.item.save()
-    borrow.status = "Returned"
-    borrow.return_date = timezone.now().date()
-    borrow.save()
-    messages.success(request, "Item marked as returned.")
+
+    if borrow.status in ['Borrowed', 'Overdue']:
+        borrow.item.stock += borrow.quantity
+        borrow.return_date = timezone.now().date()
+        borrow.status = 'Returned'
+        borrow.item.save()
+        borrow.save()
+
+        # Mark penalty as paid if exists
+        if hasattr(borrow, 'penalty'):
+            borrow.penalty.status = 'Paid'
+            borrow.penalty.paid_at = timezone.now()
+            borrow.penalty.save()
+
+        messages.success(request, "Item returned and penalty updated if any.")
+    else:
+        messages.error(request, "Borrow not active or already returned.")
+
     return redirect("manage_borrows")
 
 
 # --------- Penalty System ---------
 @login_required
 def user_penalties(request):
-    penalties = Penalty.objects.filter(borrow_transaction__user=request.user)
-    return render(request, "user/penalties.html", {"penalties": penalties})
+    # Ensure penalties are up-to-date
+    check_and_create_penalties(request.user)
+
+    penalties = Penalty.objects.filter(borrow_transaction__user=request.user).order_by('-created_at')
+    paid_count = penalties.filter(status="Paid").count()
+    unpaid_count = penalties.filter(status="Unpaid").count()
+
+    context = {
+        "penalties": penalties,
+        "paid_count": paid_count,
+        "unpaid_count": unpaid_count,
+    }
+    return render(request, "user/penalties.html", context)
+
 
 @user_passes_test(admin_check)
 def admin_penalties(request):
@@ -254,19 +278,28 @@ def admin_penalties(request):
 
 # --------- Utility: Check Overdue Borrows and Create Penalties ---------
 def check_and_create_penalties(user=None):
+    borrows = BorrowTransaction.objects.filter(status__in=['Borrowed', 'Approved'])
     if user:
-        borrows = BorrowTransaction.objects.filter(user=user, status__in=['Borrowed', 'Approved'])
-    else:
-        borrows = BorrowTransaction.objects.filter(status__in=['Borrowed', 'Approved'])
-    
+        borrows = borrows.filter(user=user)
+
     for borrow in borrows:
-        if borrow.is_overdue():
+        if not borrow.due_date:
+            continue
+
+        # Mark borrow as overdue
+        if timezone.now().date() > borrow.due_date and borrow.status != 'Overdue':
             borrow.status = 'Overdue'
             borrow.save()
-            if not hasattr(borrow, 'penalty'):
-                days_overdue = (timezone.now().date() - borrow.due_date).days
-                amount = days_overdue * 50  # Example: 50 per day overdue
-                Penalty.objects.create(borrow_transaction=borrow, amount=amount)
+
+        # Only create penalty if none exists
+        try:
+            borrow.penalty  # Access OneToOneField
+        except Penalty.DoesNotExist:
+            days_overdue = (timezone.now().date() - borrow.due_date).days
+            amount = days_overdue * 50  # 50 per day
+            Penalty.objects.create(borrow_transaction=borrow, amount=amount)
+
+
 
 @user_passes_test(admin_check)
 def update_borrow_status(request, borrow_id):
@@ -275,7 +308,9 @@ def update_borrow_status(request, borrow_id):
     if request.method == "POST":
         new_status = request.POST.get("status")
         if new_status in dict(BorrowTransaction.STATUS_CHOICES):
-            if borrow.status == "Pending" and new_status == "Borrowed":
+
+            # --- From Pending to Borrowed ---
+            if borrow.status != "Borrowed" and new_status == "Borrowed":
                 if borrow.item.stock >= borrow.quantity:
                     borrow.item.stock -= borrow.quantity
                     borrow.borrow_date = timezone.now().date()
@@ -285,11 +320,20 @@ def update_borrow_status(request, borrow_id):
                     messages.error(request, "Not enough stock.")
                     return redirect("manage_borrows")
 
-            elif borrow.status == "Borrowed" and new_status == "Returned":
+            # --- From Borrowed/Overdue to Returned ---
+            elif borrow.status in ["Borrowed", "Overdue"] and new_status == "Returned":
                 borrow.item.stock += borrow.quantity
                 borrow.return_date = timezone.now().date()
                 borrow.item.save()
 
+                # Update penalty if exists
+                penalty = Penalty.objects.filter(borrow_transaction=borrow).first()
+                if penalty:
+                    penalty.status = 'Paid'
+                    penalty.paid_at = timezone.now()
+                    penalty.save()
+
+            # --- Update status ---
             borrow.status = new_status
             borrow.save()
             messages.success(request, f"Borrow status updated to {new_status}.")
