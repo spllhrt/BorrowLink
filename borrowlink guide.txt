@@ -3,7 +3,7 @@ BSIT NS 4A
 BORROWLINK GUIDE
 
 
-* open IT ELECT Folder in VS Code
+* open ITELECT Folder in VS Code
 * go to terminal
    * .\venv\Scripts\activate
    * cd backend
@@ -16,4 +16,5 @@ BORROWLINK GUIDE
 
 * LOGIN CREDENTIALS:
    * For admin - username: admin | pass: qwerty
+
    * For users - username: crisha | pass: 12345678
