@@ -36,7 +36,6 @@ class Item(models.Model):
 class BorrowTransaction(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
-        ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
         ('Borrowed', 'Borrowed'),
         ('Returned', 'Returned'),
