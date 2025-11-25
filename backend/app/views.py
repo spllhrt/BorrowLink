@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
 from datetime import timedelta
 from django.utils import timezone
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
 from .forms import SignUpForm, BorrowForm, UserUpdateForm, ProfileUpdateForm
 from .models import Profile, Item, BorrowTransaction, Penalty
@@ -460,3 +460,27 @@ def contact_page(request):
 
 def about_page(request):
     return render(request, 'user/about.html')
+
+
+def admin_dashboard(request):
+    # Total users
+    total_users = User.objects.count()
+
+    # Total items
+    total_items = Item.objects.count()
+
+    # Active borrows (Borrowed or Overdue)
+    active_borrows = BorrowTransaction.objects.filter(
+        status__in=['Borrowed', 'Overdue']
+    ).count()
+
+    # Unpaid penalties
+    unpaid_penalties = Penalty.objects.filter(status='Unpaid').count()
+
+    context = {
+        'total_users': total_users,
+        'total_items': total_items,
+        'active_borrows': active_borrows,
+        'unpaid_penalties': unpaid_penalties,
+    }
+    return render(request, 'admin/dashboard.html', context)

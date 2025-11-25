@@ -39,4 +39,7 @@ urlpatterns = [
     path("admin/reports/", views.admin_reports, name="admin_reports"),  
     path("borrows/<int:borrow_id>/update/", views.update_borrow_status, name="update_borrow_status"),
 
+    
+    path("admin/dashboard/", views.admin_dashboard, name="admin_dashboard"),
+
 ]
