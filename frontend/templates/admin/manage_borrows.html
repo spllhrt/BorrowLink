@@ -602,7 +602,9 @@
                             <td>
                                 <form method="post" action="{% url 'update_borrow_status' borrow.id %}">
                                     {% csrf_token %}
-                                    <select name="status" class="action-select" onchange="this.form.submit()">
+                                    <select name="status" class="action-select"
+                                        {% if borrow.status == "Overdue" %}disabled{% endif %}
+                                        onchange="handleStatusChange(this, '{{ borrow.id }}')">
                                         <option value="">Update Status</option>
                                         {% for code, label in borrow.STATUS_CHOICES %}
                                             <option value="{{ code }}" {% if borrow.status == code %}selected{% endif %}>
@@ -631,6 +633,17 @@
             </div>
         </div>
     </div>
+<!-- Overdue Verification Modal -->
+<div id="overdueModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:200; justify-content:center; align-items:center;">
+    <div style="background:#1a1a2e; padding:30px; border-radius:16px; max-width:400px; width:90%; text-align:center; color:white;">
+        <h2 style="margin-bottom:20px;">Confirm Overdue Status</h2>
+        <p>Are you sure you want to mark this borrow as <strong>Overdue</strong>?</p>
+        <div style="margin-top:25px; display:flex; justify-content:center; gap:15px;">
+            <button id="cancelModal" style="padding:8px 20px; border-radius:8px; background:#555; border:none; color:white; cursor:pointer;">Cancel</button>
+            <button id="confirmModal" style="padding:8px 20px; border-radius:8px; background:#e94560; border:none; color:white; cursor:pointer;">Confirm</button>
+        </div>
+    </div>
+</div>
 
     <script>
         function toggleMenu() {
@@ -638,6 +651,37 @@
             menu.classList.toggle('show');
         }
     </script>
+    <script>
+    function handleStatusChange(selectEl, borrowId) {
+        const selected = selectEl.value;
+
+        if (selected === "Overdue") {
+            // show modal
+            const modal = document.getElementById('overdueModal');
+            modal.style.display = 'flex';
+
+            const confirmBtn = document.getElementById('confirmModal');
+            const cancelBtn = document.getElementById('cancelModal');
+
+            // cancel handler
+            cancelBtn.onclick = () => {
+                modal.style.display = 'none';
+                selectEl.value = ""; // reset dropdown
+            };
+
+            // confirm handler
+            confirmBtn.onclick = () => {
+                modal.style.display = 'none';
+                // submit the form for this borrow
+                selectEl.form.submit();
+            };
+        } else {
+            // submit immediately if not Overdue
+            selectEl.form.submit();
+        }
+    }
+</script>
+
 </body>
 
 </html>

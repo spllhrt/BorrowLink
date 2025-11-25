@@ -484,3 +484,23 @@ def admin_dashboard(request):
         'unpaid_penalties': unpaid_penalties,
     }
     return render(request, 'admin/dashboard.html', context)
+    
+@user_passes_test(admin_check)
+def cancel_overdue(request, borrow_id):
+    borrow = get_object_or_404(BorrowTransaction, id=borrow_id)
+
+    if borrow.status == "Overdue":
+        borrow.status = "Returned"   # revert back to Returned
+        borrow.item.save()
+        borrow.save()
+
+        # Delete associated penalty if exists
+        if hasattr(borrow, 'penalty'):
+            borrow.penalty.delete()
+
+        messages.success(
+            request,
+            f"Overdue cancelled. Borrow status for {borrow.item.name} set back to Returned."
+        )
+
+    return redirect("admin_penalties")

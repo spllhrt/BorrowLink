@@ -41,5 +41,8 @@ urlpatterns = [
 
     
     path("admin/dashboard/", views.admin_dashboard, name="admin_dashboard"),
+    # Admin action to cancel overdue borrow
+    path('admin/borrows/cancel-overdue/<int:borrow_id>/', views.cancel_overdue, name='cancel_overdue'),
+
 
 ]

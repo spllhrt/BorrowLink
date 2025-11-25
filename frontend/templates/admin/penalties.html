@@ -647,6 +647,15 @@
                                 {% else %}
                                 <span style="opacity: 0.5;">-</span>
                                 {% endif %}
+
+                                {% if penalty.borrow_transaction.status == "Overdue" %}
+                                <form method="POST" action="{% url 'cancel_overdue' penalty.borrow_transaction.id %}" style="display:inline; margin-left:5px;">
+                                    {% csrf_token %}
+                                    <button type="submit" style="padding:4px 10px; font-size:12px; border-radius:6px; background:#ff6b6b; color:white; border:none; cursor:pointer;">
+                                        Cancel Overdue
+                                    </button>
+                                </form>
+                                {% endif %}
                             </td>
                         </tr>
                         {% empty %}
